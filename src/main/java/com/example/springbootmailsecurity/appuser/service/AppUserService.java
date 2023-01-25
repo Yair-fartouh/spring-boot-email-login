@@ -39,8 +39,7 @@ public class AppUserService implements UserDetailsService {
         appUserRepository.save(appUser);
 //        TODO: send confirmation token
         String token = UUID.randomUUID().toString();    //UUID - מזהה המשמש לזיהוי ייחודי
-        ConfirmationToken confirmationToken = new ConfirmationToken(
-                token, LocalDateTime.now(), LocalDateTime.now().plusMinutes(15), appUser);
+        ConfirmationToken confirmationToken = new ConfirmationToken(token, LocalDateTime.now(), LocalDateTime.now().plusMinutes(15), appUser);
         confirmationTokenService.saveConfirmationToken(confirmationToken);
 //      TODO: SEND EMAIL
         return token;

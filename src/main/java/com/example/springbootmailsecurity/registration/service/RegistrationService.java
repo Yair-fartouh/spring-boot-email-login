@@ -12,6 +12,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 
 
@@ -22,6 +24,7 @@ public class RegistrationService {
     private final EmailValidator emailValidator;
     private final ConfirmationTokenService confirmationTokenService;
     private final EmailSender emailSender;
+    private HttpServletResponse response;
 
 
     public String register(RegisterationRequest request) {
@@ -46,7 +49,7 @@ public class RegistrationService {
                 .orElseThrow(() ->
                         new IllegalStateException("token not found"));
 
-        if (confirmationToken.getConfirmedAt() != null) {
+        if (confirmationToken.getConfirmedAt() != null) {       // אם נכנס לקישור אז בטבלה מתעדכן שהוא אושר כבר
             throw new IllegalStateException("email already confirmed");
         }
 
@@ -57,11 +60,10 @@ public class RegistrationService {
         }
 
         confirmationTokenService.setConfirmedAt(token);
-        appUserService.enableAppUser(
-                confirmationToken.getAppUser().getEmail());
+        appUserService.enableAppUser(confirmationToken.getAppUser().getEmail());
         return "confirmed";
     }
-    private String buildEmail(String name, String link) {
+    private String buildEmail(String name, String link) {   //Designing an email page for the client.
         return "<div style=\"font-family:Helvetica,Arial,sans-serif;font-size:16px;margin:0;color:#0b0c0c\">\n" +
                 "\n" +
                 "<span style=\"display:none;font-size:1px;color:#fff;max-height:0\"></span>\n" +
@@ -128,6 +130,14 @@ public class RegistrationService {
                 "  </tbody></table><div class=\"yj6qo\"></div><div class=\"adL\">\n" +
                 "\n" +
                 "</div></div>";
+    }
+
+    public void addTokenToCookie(String token) {        //Inserts the token into the cookies.
+        Cookie cookie = new Cookie("access_token", token);
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(3600); // expires in 1 hour
+        cookie.setPath("/");
+        response.addCookie(cookie);
     }
 }
 

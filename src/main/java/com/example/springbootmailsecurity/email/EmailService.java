@@ -28,22 +28,8 @@ public class EmailService implements EmailSender {
             helper.setText(email, true);
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {
-            throw new RuntimeException(e);
-        }
-
-
-        //MailDev - https://github.com/maildev/maildev
-        /*try {
-            MimeMessage mimeMessage = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "UDF-8");
-            helper.setText(email, true);
-            helper.setTo(to);
-            helper.setSubject("Confirm your email");
-            helper.setFrom("hello@gmail.com");
-            mailSender.send(mimeMessage);
-        } catch (MessagingException e) {
             LOGGER.error("failed to send email", e);
             throw new IllegalStateException("failed to send email");
-        }*/
+        }
     }
 }
